@@ -38,17 +38,17 @@ app.use(async (req, res, next) => {
 
 // Importing Routes
 const usersRoutes = require('./routes/users');
-const reportsRoutes = require('./routes/reports');
 const feedbackRoutes = require('./routes/feedback');
+const reportsRoutes = require('./routes/reports');
 const goalsRoutes = require('./routes/goals');
 const transportationRoutes = require('./routes/transportation');
 
 // Register Routes
-app.use('/api/users', usersRoutes);
-app.use('/api/reports', reportsRoutes);
-app.use('/api/feedback', feedbackRoutes);
-app.use('/api/goals', goalsRoutes);
-app.use('/api/transportation', transportationRoutes);
+app.use('/api/users', usersRoutes); // Users routes
+app.use('/api/feedback', feedbackRoutes); // Feedback routes
+app.use('/api/reports', reportsRoutes); // Reports routes
+app.use('/api/goals', goalsRoutes); // Goals routes
+app.use('/api/transportation', transportationRoutes); // Transportation routes
 
 // Default Route
 app.get('/', (req, res) => {

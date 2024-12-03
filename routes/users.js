@@ -22,17 +22,30 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+
 // POST: Add a new user
 router.post('/', async (req, res) => {
     try {
         const { DOB, Gender, password, email, NotifPrefs, mode, name, locationType } = req.body;
-        await req.db.query(`
+        const request = req.db.request();
+        request.input('DOB', DOB);
+        request.input('Gender', Gender);
+        request.input('password', password);
+        request.input('email', email);
+        request.input('NotifPrefs', NotifPrefs);
+        request.input('mode', mode);
+        request.input('name', name);
+        request.input('locationType', locationType);
+
+        await request.query(`
             INSERT INTO Users (DOB, Gender, [password], email, NotifPrefs, mode, [name], locationType)
-            VALUES ('${DOB}', '${Gender}', '${password}', '${email}', '${NotifPrefs}', '${mode}', '${name}', '${locationType}')
+            VALUES (@DOB, @Gender, @password, @Email, @NotifPrefs, @Mode, @Name, @LocationType)
         `);
-        res.status(201).send('User added successfully');
+
+        res.status(201).send({ message: 'User added successfully' });
     } catch (err) {
-        res.status(500).send(err.message);
+        console.error('Error adding user:', err.message);
+        res.status(500).send({ error: 'Failed to add user', details: err.message });
     }
 });
 
