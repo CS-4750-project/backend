@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const mssql = require('mssql');
 const app = express();
 
-// Middleware
+// Middleware for parsing JSON
 app.use(bodyParser.json());
 
 // Database Configuration
@@ -27,30 +27,42 @@ app.use(async (req, res, next) => {
             global.connectionPool = await mssql.connect(dbConfig);
             console.log('Connected to the database');
         }
-        req.db = global.connectionPool;
+        req.db = global.connectionPool; // Attach database connection to the request object
         next();
     } catch (err) {
         console.error('Database connection failed:', err.message);
-        res.status(500).send('Database connection error');
+        res.status(500).send({ error: 'Database connection error' });
     }
 });
 
-// Routes
-app.use('/api/users', require('./routes/users'));
-app.use('/api/reports', require('./routes/reports'));
-app.use('/api/feedback', require('./routes/feedback'));
-app.use('/api/goals', require('./routes/goals'));
-app.use('/api/transportation', require('./routes/transportation'));
+// Importing Routes
+const usersRoutes = require('./routes/users');
+const reportsRoutes = require('./routes/reports');
+const feedbackRoutes = require('./routes/feedback');
+const goalsRoutes = require('./routes/goals');
+const transportationRoutes = require('./routes/transportation');
+
+// Register Routes
+app.use('/api/users', usersRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/goals', goalsRoutes);
+app.use('/api/transportation', transportationRoutes);
 
 // Default Route
 app.get('/', (req, res) => {
     res.send('Welcome to the Personal Carbon Footprint Tracker API!');
 });
 
-// Error Handling Middleware
+// Error Handling Middleware for Unknown Routes
+app.use((req, res, next) => {
+    res.status(404).send({ error: 'Route not found' });
+});
+
+// General Error Handling Middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Something went wrong!');
+    res.status(500).send({ error: 'Something went wrong!' });
 });
 
 // Start the Server
