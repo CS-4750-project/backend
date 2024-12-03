@@ -24,14 +24,15 @@ const dbConfig = {
 app.use(async (req, res, next) => {
     try {
         if (!global.connectionPool) {
+            console.log('Connecting to the database...');
             global.connectionPool = await mssql.connect(dbConfig);
-            console.log('Connected to the database');
+            console.log('Database connected successfully');
         }
-        req.db = global.connectionPool; // Attach database connection to the request object
+        req.db = global.connectionPool; // Attach the connection pool to the request object
         next();
     } catch (err) {
         console.error('Database connection failed:', err.message);
-        res.status(500).send({ error: 'Database connection error' });
+        res.status(500).send({ error: 'Database connection error', details: err.message });
     }
 });
 
